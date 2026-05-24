@@ -6,9 +6,11 @@ import toast from "react-hot-toast";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
+const API =
+  "https://fleetflow-backend-vdle.onrender.com";
+
 const Vehicles = () => {
 
-  // States
   const [vehicles, setVehicles] =
     useState([]);
 
@@ -31,16 +33,22 @@ const Vehicles = () => {
     try {
 
       const res = await axios.get(
-        "http://localhost:5000/api/vehicles"
+        `${API}/api/vehicles`
       );
 
-      setVehicles(res.data);
+      if (Array.isArray(res.data)) {
+        setVehicles(res.data);
+      } else {
+        setVehicles([]);
+      }
 
     } catch (error) {
 
       console.log(error);
 
-      toast.error("Failed to fetch vehicles");
+      toast.error(
+        "Failed to fetch vehicles"
+      );
     }
   };
 
@@ -48,7 +56,7 @@ const Vehicles = () => {
     fetchVehicles();
   }, []);
 
-  // Filter Vehicles
+  // Filter
   const filteredVehicles =
     vehicles.filter((vehicle) =>
       vehicle.vehicleNumber
@@ -72,7 +80,7 @@ const Vehicles = () => {
     });
   };
 
-  // Add / Update Vehicle
+  // Add / Update
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -81,7 +89,7 @@ const Vehicles = () => {
       if (editingId) {
 
         await axios.put(
-          `http://localhost:5000/api/vehicles/${editingId}`,
+          `${API}/api/vehicles/${editingId}`,
           formData
         );
 
@@ -94,7 +102,7 @@ const Vehicles = () => {
       } else {
 
         await axios.post(
-          "http://localhost:5000/api/vehicles",
+          `${API}/api/vehicles`,
           formData
         );
 
@@ -105,7 +113,6 @@ const Vehicles = () => {
 
       fetchVehicles();
 
-      // Reset Form
       setFormData({
         vehicleNumber: "",
         driverName: "",
@@ -117,11 +124,13 @@ const Vehicles = () => {
 
       console.log(error);
 
-      toast.error("Operation Failed");
+      toast.error(
+        "Operation Failed"
+      );
     }
   };
 
-  // Edit Vehicle
+  // Edit
   const editVehicle = (vehicle) => {
 
     setFormData({
@@ -134,12 +143,12 @@ const Vehicles = () => {
     setEditingId(vehicle._id);
   };
 
-  // Delete Vehicle
+  // Delete
   const deleteVehicle = async (id) => {
     try {
 
       await axios.delete(
-        `http://localhost:5000/api/vehicles/${id}`
+        `${API}/api/vehicles/${id}`
       );
 
       toast.success(
@@ -152,7 +161,9 @@ const Vehicles = () => {
 
       console.log(error);
 
-      toast.error("Delete Failed");
+      toast.error(
+        "Delete Failed"
+      );
     }
   };
 
@@ -252,23 +263,27 @@ const Vehicles = () => {
 
             <tr className="border-b">
 
-              <th className="py-3 text-left">
+              <th className="text-left py-3">
                 Vehicle No
               </th>
 
-              <th className="py-3 text-left">
+              <th className="text-left py-3">
                 Driver
               </th>
 
-              <th className="py-3 text-left">
+              <th className="text-left py-3">
                 Type
               </th>
 
-              <th className="py-3 text-left">
+              <th className="text-left py-3">
                 Capacity
               </th>
 
-              <th className="py-3 text-left">
+              <th className="text-left py-3">
+                Status
+              </th>
+
+              <th className="text-left py-3">
                 Actions
               </th>
 
@@ -299,6 +314,21 @@ const Vehicles = () => {
 
                 <td>
                   {vehicle.capacity}
+                </td>
+
+                <td>
+
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                      vehicle.status ===
+                      "Busy"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                  >
+                    {vehicle.status}
+                  </span>
+
                 </td>
 
                 <td className="space-x-2">

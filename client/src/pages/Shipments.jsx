@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
+const API =
+  "https://fleetflow-backend-vdle.onrender.com";
+
 const Shipments = () => {
 
   const [shipments, setShipments] =
@@ -14,7 +17,6 @@ const Shipments = () => {
   const [search, setSearch] =
     useState("");
 
-  // Edit State
   const [editingId, setEditingId] =
     useState(null);
 
@@ -32,7 +34,7 @@ const Shipments = () => {
     try {
 
       const res = await axios.get(
-        "http://localhost:5000/api/shipments"
+        `${API}/api/shipments`
       );
 
       setShipments(res.data);
@@ -51,7 +53,7 @@ const Shipments = () => {
     fetchShipments();
   }, []);
 
-  // Filter Shipments
+  // Filter
   const filteredShipments =
     shipments.filter((shipment) =>
       shipment.shipmentId
@@ -75,17 +77,16 @@ const Shipments = () => {
     });
   };
 
-  // Add / Update Shipment
+  // Add / Update
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
 
-      // UPDATE
       if (editingId) {
 
         await axios.put(
-          `http://localhost:5000/api/shipments/${editingId}`,
+          `${API}/api/shipments/${editingId}`,
           formData
         );
 
@@ -97,9 +98,8 @@ const Shipments = () => {
 
       } else {
 
-        // CREATE
         await axios.post(
-          "http://localhost:5000/api/shipments",
+          `${API}/api/shipments`,
           formData
         );
 
@@ -110,7 +110,6 @@ const Shipments = () => {
 
       fetchShipments();
 
-      // Reset Form
       setFormData({
         shipmentId: "",
         productName: "",
@@ -129,7 +128,7 @@ const Shipments = () => {
     }
   };
 
-  // Edit Shipment
+  // Edit
   const editShipment = (shipment) => {
 
     setFormData({
@@ -144,12 +143,12 @@ const Shipments = () => {
     setEditingId(shipment._id);
   };
 
-  // Delete Shipment
+  // Delete
   const deleteShipment = async (id) => {
     try {
 
       await axios.delete(
-        `http://localhost:5000/api/shipments/${id}`
+        `${API}/api/shipments/${id}`
       );
 
       toast.success(
@@ -260,148 +259,6 @@ const Shipments = () => {
         }
         className="border p-3 rounded-xl mb-6 w-full"
       />
-
-      {/* Table */}
-      <div className="bg-white rounded-2xl shadow p-6">
-
-        <h2 className="text-2xl font-bold mb-6">
-          Shipment List
-        </h2>
-
-        <table className="w-full">
-
-          <thead>
-
-            <tr className="border-b">
-
-              <th className="py-3 text-left">
-                Shipment ID
-              </th>
-
-              <th className="py-3 text-left">
-                Product
-              </th>
-
-              <th className="py-3 text-left">
-                Source
-              </th>
-
-              <th className="py-3 text-left">
-                Destination
-              </th>
-
-              <th className="py-3 text-left">
-                Vehicle
-              </th>
-
-              <th className="py-3 text-left">
-                Created
-              </th>
-
-              <th className="py-3 text-left">
-                Status
-              </th>
-
-              <th className="py-3 text-left">
-                Actions
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {filteredShipments.map((shipment) => (
-
-              <tr
-                key={shipment._id}
-                className="border-b"
-              >
-
-                <td className="py-4">
-                  {shipment.shipmentId}
-                </td>
-
-                <td>
-                  {shipment.productName}
-                </td>
-
-                <td>
-                  {shipment.source}
-                </td>
-
-                <td>
-                  {shipment.destination}
-                </td>
-
-                <td>
-                  {shipment.assignedVehicle}
-                </td>
-
-                <td>
-                  {new Date(
-                    shipment.createdAt
-                  ).toLocaleDateString()}
-                </td>
-
-                <td>
-
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      shipment.status ===
-                      "Pending"
-                        ? "bg-yellow-100 text-yellow-700"
-
-                        : shipment.status ===
-                          "In Transit"
-                        ? "bg-blue-100 text-blue-700"
-
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
-                    {shipment.status}
-                  </span>
-
-                </td>
-
-                <td className="space-x-2">
-
-                  {/* Edit Only Pending */}
-                  {shipment.status ===
-                    "Pending" && (
-
-                    <button
-                      onClick={() =>
-                        editShipment(shipment)
-                      }
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
-                    >
-                      Edit
-                    </button>
-
-                  )}
-
-                  <button
-                    onClick={() =>
-                      deleteShipment(shipment._id)
-                    }
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    Delete
-                  </button>
-
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
-
-      </div>
 
     </DashboardLayout>
   );
