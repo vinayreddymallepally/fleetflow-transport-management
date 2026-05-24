@@ -1,39 +1,30 @@
 import { useEffect, useState } from "react";
-
 import axios from "axios";
-
-import toast from "react-hot-toast";
-
 import DashboardLayout from "../layouts/DashboardLayout";
-
-const API =
-  "https://fleetflow-backend-vdle.onrender.com";
 
 const Vehicles = () => {
 
-  const [vehicles, setVehicles] =
-    useState([]);
+  // Vehicle State
+  const [vehicles, setVehicles] = useState([]);
 
-  const [search, setSearch] =
-    useState("");
-
+  // Edit State
   const [editingId, setEditingId] =
     useState(null);
 
-  const [formData, setFormData] =
-    useState({
-      vehicleNumber: "",
-      driverName: "",
-      vehicleType: "",
-      capacity: "",
-    });
+  // Form State
+  const [formData, setFormData] = useState({
+    vehicleNumber: "",
+    driverName: "",
+    vehicleType: "",
+    capacity: "",
+  });
 
   // Fetch Vehicles
   const fetchVehicles = async () => {
     try {
 
       const res = await axios.get(
-        `${API}/api/vehicles`
+        "https://fleetflow-backend-vdle.onrender.com/api/vehicles"
       );
 
       if (Array.isArray(res.data)) {
@@ -44,33 +35,16 @@ const Vehicles = () => {
 
     } catch (error) {
 
-      console.log(error);
+      console.log("Fetch Error:", error);
 
-      toast.error(
-        "Failed to fetch vehicles"
-      );
+      setVehicles([]);
     }
   };
 
+  // Load Vehicles
   useEffect(() => {
     fetchVehicles();
   }, []);
-
-  // Filter
-  const filteredVehicles =
-    vehicles.filter((vehicle) =>
-      vehicle.vehicleNumber
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-
-      vehicle.driverName
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-
-      vehicle.vehicleType
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
 
   // Handle Input
   const handleChange = (e) => {
@@ -80,39 +54,35 @@ const Vehicles = () => {
     });
   };
 
-  // Add / Update
+  // Add or Update Vehicle
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
 
+      // UPDATE
       if (editingId) {
 
         await axios.put(
-          `${API}/api/vehicles/${editingId}`,
+          `https://fleetflow-backend-vdle.onrender.com/api/vehicles/${editingId}`,
           formData
-        );
-
-        toast.success(
-          "Vehicle Updated"
         );
 
         setEditingId(null);
 
       } else {
 
+        // CREATE
         await axios.post(
-          `${API}/api/vehicles`,
+          "https://fleetflow-backend-vdle.onrender.com/api/vehicles",
           formData
-        );
-
-        toast.success(
-          "Vehicle Added"
         );
       }
 
+      // Refresh Data
       fetchVehicles();
 
+      // Clear Form
       setFormData({
         vehicleNumber: "",
         driverName: "",
@@ -122,15 +92,11 @@ const Vehicles = () => {
 
     } catch (error) {
 
-      console.log(error);
-
-      toast.error(
-        "Operation Failed"
-      );
+      console.log("Submit Error:", error);
     }
   };
 
-  // Edit
+  // Edit Vehicle
   const editVehicle = (vehicle) => {
 
     setFormData({
@@ -143,34 +109,26 @@ const Vehicles = () => {
     setEditingId(vehicle._id);
   };
 
-  // Delete
+  // Delete Vehicle
   const deleteVehicle = async (id) => {
     try {
 
       await axios.delete(
-        `${API}/api/vehicles/${id}`
-      );
-
-      toast.success(
-        "Vehicle Deleted"
+        `https://fleetflow-backend-vdle.onrender.com/api/vehicles/${id}`
       );
 
       fetchVehicles();
 
     } catch (error) {
 
-      console.log(error);
-
-      toast.error(
-        "Delete Failed"
-      );
+      console.log("Delete Error:", error);
     }
   };
 
   return (
     <DashboardLayout>
 
-      <h1 className="text-4xl font-bold mb-8">
+      <h1 className="text-3xl font-bold mb-8">
         Vehicle Management
       </h1>
 
@@ -188,7 +146,7 @@ const Vehicles = () => {
             placeholder="Vehicle Number"
             value={formData.vehicleNumber}
             onChange={handleChange}
-            className="border p-3 rounded-xl"
+            className="border p-3 rounded-lg"
             required
           />
 
@@ -198,7 +156,7 @@ const Vehicles = () => {
             placeholder="Driver Name"
             value={formData.driverName}
             onChange={handleChange}
-            className="border p-3 rounded-xl"
+            className="border p-3 rounded-lg"
             required
           />
 
@@ -208,7 +166,7 @@ const Vehicles = () => {
             placeholder="Vehicle Type"
             value={formData.vehicleType}
             onChange={handleChange}
-            className="border p-3 rounded-xl"
+            className="border p-3 rounded-lg"
             required
           />
 
@@ -218,7 +176,7 @@ const Vehicles = () => {
             placeholder="Capacity"
             value={formData.capacity}
             onChange={handleChange}
-            className="border p-3 rounded-xl"
+            className="border p-3 rounded-lg"
             required
           />
 
@@ -226,7 +184,7 @@ const Vehicles = () => {
 
         <button
           type="submit"
-          className={`mt-5 text-white px-6 py-3 rounded-xl ${
+          className={`mt-5 text-white px-6 py-3 rounded-lg ${
             editingId
               ? "bg-yellow-500 hover:bg-yellow-600"
               : "bg-blue-600 hover:bg-blue-700"
@@ -239,18 +197,7 @@ const Vehicles = () => {
 
       </form>
 
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search Vehicles..."
-        value={search}
-        onChange={(e) =>
-          setSearch(e.target.value)
-        }
-        className="border p-3 rounded-xl mb-6 w-full"
-      />
-
-      {/* Table */}
+      {/* Vehicle Table */}
       <div className="bg-white rounded-2xl shadow p-6">
 
         <h2 className="text-2xl font-bold mb-6">
@@ -293,69 +240,75 @@ const Vehicles = () => {
 
           <tbody>
 
-            {filteredVehicles.map((vehicle) => (
+            {vehicles.length > 0 ? (
 
-              <tr
-                key={vehicle._id}
-                className="border-b"
-              >
+              vehicles.map((vehicle) => (
 
-                <td className="py-4">
-                  {vehicle.vehicleNumber}
-                </td>
+                <tr
+                  key={vehicle._id}
+                  className="border-b"
+                >
 
-                <td>
-                  {vehicle.driverName}
-                </td>
+                  <td className="py-4">
+                    {vehicle.vehicleNumber}
+                  </td>
 
-                <td>
-                  {vehicle.vehicleType}
-                </td>
+                  <td>
+                    {vehicle.driverName}
+                  </td>
 
-                <td>
-                  {vehicle.capacity}
-                </td>
+                  <td>
+                    {vehicle.vehicleType}
+                  </td>
 
-                <td>
+                  <td>
+                    {vehicle.capacity}
+                  </td>
 
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      vehicle.status ===
-                      "Busy"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
+                  <td className="text-green-600 font-semibold">
                     {vehicle.status}
-                  </span>
+                  </td>
 
-                </td>
+                  <td className="space-x-2">
 
-                <td className="space-x-2">
+                    <button
+                      onClick={() =>
+                        editVehicle(vehicle)
+                      }
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
+                    >
+                      Edit
+                    </button>
 
-                  <button
-                    onClick={() =>
-                      editVehicle(vehicle)
-                    }
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    Edit
-                  </button>
+                    <button
+                      onClick={() =>
+                        deleteVehicle(vehicle._id)
+                      }
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                    >
+                      Delete
+                    </button>
 
-                  <button
-                    onClick={() =>
-                      deleteVehicle(vehicle._id)
-                    }
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    Delete
-                  </button>
+                  </td>
 
+                </tr>
+
+              ))
+
+            ) : (
+
+              <tr>
+
+                <td
+                  colSpan="6"
+                  className="text-center py-6 text-gray-500"
+                >
+                  No Vehicles Found
                 </td>
 
               </tr>
 
-            ))}
+            )}
 
           </tbody>
 

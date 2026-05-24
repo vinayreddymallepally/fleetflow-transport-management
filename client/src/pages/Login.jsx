@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 import toast from "react-hot-toast";
 
-const API =
-  "https://fleetflow-backend-vdle.onrender.com";
-
 const Login = () => {
 
   const navigate = useNavigate();
@@ -38,23 +35,23 @@ const Login = () => {
       setLoading(true);
 
       const res = await axios.post(
-        `${API}/api/auth/login`,
+        "https://fleetflow-backend-vdle.onrender.com/api/auth/login",
         formData
       );
 
+      // Save Token
       localStorage.setItem(
         "token",
         res.data.token
       );
 
+      // Save User
       localStorage.setItem(
         "user",
         JSON.stringify(res.data.user)
       );
 
-      toast.success(
-        "Login Successful"
-      );
+      toast.success("Login Successful");
 
       navigate("/");
 
@@ -62,9 +59,7 @@ const Login = () => {
 
       console.log(error);
 
-      toast.error(
-        "Invalid Credentials"
-      );
+      toast.error("Invalid Credentials");
 
     } finally {
 
