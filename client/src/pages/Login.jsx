@@ -115,6 +115,23 @@ const Login = () => {
 
         </form>
 
+        {/* Demo Credentials */}
+        <div className="mt-6 bg-gray-100 p-4 rounded-xl">
+
+          <h3 className="font-bold mb-2 text-gray-700">
+            Demo Credentials
+          </h3>
+
+          <p className="text-sm text-gray-600">
+            Email: admin@gmail.com
+          </p>
+
+          <p className="text-sm text-gray-600">
+            Password: admin123
+          </p>
+
+        </div>
+
       </div>
 
     </div>
